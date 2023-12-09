@@ -1,6 +1,5 @@
 package lojaVirtual;
 
-import javax.swing.JOptionPane;
 
 public class Produto {
     
@@ -22,7 +21,7 @@ public class Produto {
             switch(type){
                 case "result":
                     System.out.println(parametro);
-                    if(parametro.equals("insuficiente")){
+                    if(parametro.equals("Insuficiente")){
                         throw new Exception("Dinheiro Insuficiente");
                     }else{
                         throw new Exception("Produto Insuficiente");

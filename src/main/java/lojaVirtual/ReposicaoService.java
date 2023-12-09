@@ -7,7 +7,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import javax.swing.JButton;
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,28 +24,35 @@ public class ReposicaoService {
             Registry registry = LocateRegistry.getRegistry(host);
             InterfaceRMI stub = (InterfaceRMI) registry.lookup("InterfaceRMI");
             JFrame display = new JFrame("Reposição");
-
-            String[] options = {"Brita (Saco)", "Cimento (Saco)", "Areia (Metro Cubico)", "Ceramica (Metro Quadrado)"};
-            double[] precos = {85.5f, 29.99f, 166.91f, 31.00f};
-            String[] setores = {"Fundação", "Concretagem", "Fundação", "Revestimento"};
+         
+            ArrayList<Produto> produtos = new ArrayList<Produto>();
+            
+            produtos.add(new Produto("Brita (Saco)", 85.50f, "Fundação"));
+            produtos.add(new Produto("Cimento (Saco)", 25.99f, "Concretagem"));
+            produtos.add(new Produto("Areia (Metro Cubico)", 166.91f, "Fundação"));
+            produtos.add(new Produto("Ceramica (Metro Quadrado)", 31.00f, "Revestimento"));
+            produtos.add(new Produto("Caibro Eucalipto (6cmx6cmx3m)", 41.90f, "Suporte"));
+            produtos.add(new Produto("Aluminio Liso (1mm X 1000mm)", 2368.54f, "Revestimento"));
+            produtos.add(new Produto("Forro Fibra M.(13mm C/ 12pçs)", 569.25f, "Revestimento"));
+            
             int posicao = 50;
 
             JLabel header2 = new JLabel("Adicionar o produto:");
             header2.setBounds(10, 10, 200, 30);
             display.add(header2);
 
-            for (int i = 0; i < options.length; i++) {
-                String json = "{'nome':'" + options[i]
-                		+ "','preco':'" + Double.toString(precos[i])
-                		+ "','setor':'" + setores[i]+"'}";
+            for (int i = 0; i < produtos.size(); i++) {
+                String json = "{'nome':'" + produtos.get(i).getNome()
+                		+ "','preco':'" + Double.toString(produtos.get(i).getPreco())
+                		+ "','setor':'" + produtos.get(i).getSetor()  +"'}";
                 
-                MeuBotao botao = new MeuBotao(options[i], json);
+                BotaoProduto botao = new BotaoProduto(produtos.get(i).getNome(), json);
                 botao.setBounds(10, posicao, 290, 30);
                 
                 posicao += 50;
 
                 botao.addActionListener((ActionEvent e) -> {
-                    MeuBotao clickedButton = (MeuBotao) e.getSource();
+                    BotaoProduto clickedButton = (BotaoProduto) e.getSource();
                     
                     try {
                         String envio = stub.repoePratileira(clickedButton.getKey());
@@ -57,7 +65,7 @@ public class ReposicaoService {
                 display.add(botao);
             }
 
-            display.setSize(330, 300);
+            display.setSize(330, 450);
             display.setLayout(null);
 
             display.addWindowListener(new WindowAdapter() {

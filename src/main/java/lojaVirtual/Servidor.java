@@ -1,6 +1,5 @@
 package lojaVirtual;
 
-//Imports de WebService
 import javax.xml.ws.Endpoint;
 
 //Imports de RMI
@@ -26,16 +25,19 @@ public class Servidor implements InterfaceRMI, WebServiceVendas {
             this.produtos.add(new Produto("Cimento (Saco)", 25.99f, "Concretagem"));
             this.produtos.add(new Produto("Areia (Metro Cubico)", 166.91f, "Fundação"));
             this.produtos.add(new Produto("Ceramica (Metro Quadrado)", 31.00f, "Revestimento"));
+            this.produtos.add(new Produto("Caibro Eucalipto (6cmx6cmx3m)", 41.90f, "Suporte"));
+            this.produtos.add(new Produto("Aluminio Liso (1mm X 1000mm)", 2368.54f, "Revestimento"));
+            this.produtos.add(new Produto("Forro Fibra M.(13mm C/ 12pçs)", 569.25f, "Revestimento"));
         }
     }
 
     // Método de compra do WebService
     @Override
-    public String compra(String nome, double dinheiro, String usuario) {
-    	
+    public String compra(String nome, double dinheiro, String cliente) {
+    	//Tranca para o cliente executar uma compra
         tranca.lock();
         try {
-            if (usuario.equals("espera")) {
+            if (cliente.equals("espera")) {
                 Thread.sleep(10000);
             }
             for (Produto produto : produtos) {
@@ -45,31 +47,33 @@ public class Servidor implements InterfaceRMI, WebServiceVendas {
                         produtos.remove(produto);
                         return produto.ProdutoToJson();
                     } else {
-                        return "{'result':'insuficiente'}";
+                        return "{'result':'Insuficiente'}";
                     }
                 }
             }
-            return "{'result':'semProduto'}";
+            return "{'result':'Sem Estoque'}";
         } catch (InterruptedException ex) {
-            return "{'result':'erroEspera'}";
+            return "{'result':'ErroTimerOut'}";
         } finally {
             tranca.unlock();
         }
     }
 
-    //MÉTODO IMPLEMENTADO DE RMI
+    //Método do RMI
     @Override
-    public String repoePratileira(String json) throws RemoteException {
+    public String repoePratileira(String mensagem) throws RemoteException {
+    	//Tranca para fazer a reposição
         tranca.lock();
         try {
         	//Adiciona mais 5 produtos a pratileira
         	for(int i = 0; i < 5; i++) {
-        		this.produtos.add(new Produto(json));
+        		this.produtos.add(new Produto(mensagem));
         	}
             return "Produtos Adicionados a Pratileira";
         } catch (Exception ex) {
             return "Falha ao Repor";
         } finally {
+        	//Destranca depois de fazer tudo
             tranca.unlock();
         }
     }
@@ -90,6 +94,7 @@ public class Servidor implements InterfaceRMI, WebServiceVendas {
             registry.bind("InterfaceRMI", stub);
 
             System.out.println("Servidor online");
+            
         } catch (Exception e) {
             System.out.println("Erro ao iniciar servidor: " + e.getMessage());
         }

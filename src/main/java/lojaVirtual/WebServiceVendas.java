@@ -15,6 +15,6 @@ public interface WebServiceVendas {
     @GET
     @Path("/compra/{nome}/{dinheiro}")
     @Produces(MediaType.TEXT_PLAIN)
-	String compra(@PathParam(value = "nome") String nome, @PathParam(value = "dinheiro") double dinheiro, String usuario);
+	String compra(@PathParam(value = "nome") String nome, @PathParam(value = "dinheiro") double dinheiro, String cliente);
     
 }
