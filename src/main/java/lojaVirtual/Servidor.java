@@ -34,12 +34,13 @@ public class Servidor implements InterfaceRMI, WebServiceVendas {
     // Método de compra do WebService
     @Override
     public String compra(String nome, double dinheiro, String cliente) {
-    	//Tranca para o cliente executar uma compra
-        tranca.lock();
-        try {
-            if (cliente.equals("espera")) {
-                Thread.sleep(10000);
-            }
+    		  	
+    	try {
+    		//Timeout antes de pegar a tranca para o recurso compartilhado
+    		Thread.sleep(5000);
+    		
+    		//Tranca para o cliente executar uma compra
+            tranca.lock();
             for (Produto produto : produtos) {
                 
                 if (produto.getNome().equals(nome)) {
